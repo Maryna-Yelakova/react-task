@@ -1,36 +1,25 @@
-'use strict';
+import AppView from "../views/AppView";
+import {Container} from "flux/utils";
+import React from "react";
+import TasksStore from "../data/TodoStore";
+import Actions from "../data/TodoActions";
 
-import AppView from '../views/AppView';
-import {Container} from 'flux/utils';
-import TodoActions from '../data/TodoActions';
-import TodoDraftStore from '../data/TodoDraftStore';
-import TodoEditStore from '../data/TodoEditStore';
-import TodoStore from '../data/TodoStore';
-
-function getStores() {
-    return [
-        TodoEditStore,
-        TodoDraftStore,
-        TodoStore,
-    ];
+class AppContainer extends React.Component
+{
+    static getStores() {
+        return [TasksStore];
+    }
+    static calculateState(prevState) {
+        return {
+            tasks: TasksStore.getState(),
+            onAddItem: Actions.addItem,
+            onRemoveItem: Actions.removeItem
+        };
+    }
+    render() {
+        return <AppView tasks={this.state.tasks}
+                        onRemoveItem={this.state.onRemoveItem}
+                        onAddItem={this.state.onAddItem}  />;
+    }
 }
-
-function getState() {
-    return {
-        draft: TodoDraftStore.getState(),
-        editing: TodoEditStore.getState(),
-        todos: TodoStore.getState(),
-
-        onAdd: TodoActions.addTodo,
-        onDeleteCompletedTodos: TodoActions.deleteCompletedTodos,
-        onDeleteTodo: TodoActions.deleteTodo,
-        onEditTodo: TodoActions.editTodo,
-        onStartEditingTodo: TodoActions.startEditingTodo,
-        onStopEditingTodo: TodoActions.stopEditingTodo,
-        onToggleAllTodos: TodoActions.toggleAllTodos,
-        onToggleTodo: TodoActions.toggleTodo,
-        onUpdateDraft: TodoActions.updateDraft,
-    };
-}
-
-export default Container.createFunctional(AppView, getStores, getState);
+export default Container.create(AppContainer);
